@@ -62,7 +62,7 @@ export default function RegisterClient() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3">
-            <Image src="/images/logo.png" alt="Berry Fitness for Health" width={385} height={163} priority className="h-20 w-auto" />
+            <Image src="/images/logo-white.svg" alt="Berry Fitness for Health" width={389} height={167} priority className="h-20 w-auto" />
           </Link>
         </div>
 

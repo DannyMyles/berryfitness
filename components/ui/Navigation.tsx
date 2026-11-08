@@ -56,9 +56,8 @@ export default function Navigation() {
             : 'border-transparent bg-white/60 backdrop-blur-md'
         }`}
       >
-        <Link href="/" className="flex shrink-0 items-center rounded-xl bg-black px-3 py-1.5" aria-label="Berry Fitness for Health home">
-          {/* White-on-transparent logo, shown on Berry's signature black. */}
-          <Image src="/images/logo.png" alt="Berry Fitness for Health" width={385} height={163} priority className="h-9 w-auto md:h-10" />
+        <Link href="/" className="flex shrink-0 items-center pl-1" aria-label="Berry Fitness for Health home">
+          <Image src="/images/logo.svg" alt="Berry Fitness for Health" width={389} height={167} priority className="h-11 w-auto md:h-12" />
         </Link>
 
         <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
@@ -68,7 +67,7 @@ export default function Navigation() {
               href={l.href}
               aria-current={isActive(l.href) ? 'page' : undefined}
               className={`relative rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
-                isActive(l.href) ? 'bg-ink text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-ink'
+                isActive(l.href) ? 'bg-fitness-primary/10 font-semibold text-fitness-primary-dark' : 'text-gray-600 hover:bg-gray-100 hover:text-fitness-primary-dark'
               }`}
             >
               {l.name}

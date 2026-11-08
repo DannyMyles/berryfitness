@@ -15,8 +15,8 @@
   --color-fitness-light: #F7F9F8;
   --color-fitness-dark: #0B1A22;
   /* Deep neutral for dark surfaces (footer, page banners, feature panels). */
-  --color-ink: #0F1117;
-  --color-ink-soft: #1A1D26;
+  --color-ink: #1F3541;
+  --color-ink-soft: #2A4655;
 
   /* Accent scale — used throughout the admin panel (buttons, badges, focus
      rings, pills). Same brand orange as fitness-primary, just exposed as a

@@ -39,7 +39,7 @@ export default function PageHero({ badge, badgeIcon: Icon, title, subtitle }: Pa
           )}
           <h1 className="font-display text-4xl font-bold leading-[1.02] tracking-tight sm:text-5xl md:text-7xl">
             {words.length > 0 && `${words.join(' ')} `}
-            <span className="text-fitness-primary">{last}</span>
+            <span className="text-fitness-primary-light">{last}</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/70 md:text-lg">{subtitle}</p>
         </div>

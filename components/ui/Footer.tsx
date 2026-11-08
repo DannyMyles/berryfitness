@@ -80,7 +80,7 @@ export default function Footer() {
           <div className="reveal max-w-xl">
             <p className="eyebrow text-fitness-primary-light">{footerCta.eyebrow}</p>
             <h2 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl">
-              {footerCta.title} <span className="text-fitness-primary">{footerCta.highlight}</span>
+              {footerCta.title} <span className="text-fitness-primary-light">{footerCta.highlight}</span>
             </h2>
           </div>
           <div className="reveal flex flex-wrap gap-3">
@@ -102,7 +102,7 @@ export default function Footer() {
         <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <Link href="/" className="inline-block">
-              <Image src="/images/logo.png" alt={site.name} width={385} height={163} className="h-16 w-auto" />
+              <Image src="/images/logo-white.svg" alt={site.name} width={389} height={167} className="h-16 w-auto" />
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">
               {site.settings.about?.mission || site.settings.about?.body}
@@ -177,15 +177,15 @@ export default function Footer() {
             {error && <p role="alert" className="mt-2 text-sm text-red-400">{error}</p>}
 
             <ul className="mt-6 space-y-2.5 text-sm text-white/70">
-              {site.contactPhone && <li><a href={telHref(site.contactPhone)} className="inline-flex items-center gap-2.5 hover:text-white"><Phone size={16} className="text-fitness-primary" /> {site.contactPhone}</a></li>}
-              {site.contactEmail && <li><a href={`mailto:${site.contactEmail}`} className="inline-flex items-center gap-2.5 break-all hover:text-white"><Mail size={16} className="shrink-0 text-fitness-primary" /> {site.contactEmail}</a></li>}
-              {site.location && <li className="flex items-center gap-2.5"><MapPin size={16} className="text-fitness-primary" /> {site.location}</li>}
-              {site.settings.hours && <li className="flex items-center gap-2.5"><Clock size={16} className="text-fitness-primary" /> {site.settings.hours}</li>}
+              {site.contactPhone && <li><a href={telHref(site.contactPhone)} className="inline-flex items-center gap-2.5 hover:text-white"><Phone size={16} className="text-fitness-primary-light" /> {site.contactPhone}</a></li>}
+              {site.contactEmail && <li><a href={`mailto:${site.contactEmail}`} className="inline-flex items-center gap-2.5 break-all hover:text-white"><Mail size={16} className="shrink-0 text-fitness-primary-light" /> {site.contactEmail}</a></li>}
+              {site.location && <li className="flex items-center gap-2.5"><MapPin size={16} className="text-fitness-primary-light" /> {site.location}</li>}
+              {site.settings.hours && <li className="flex items-center gap-2.5"><Clock size={16} className="text-fitness-primary-light" /> {site.settings.hours}</li>}
             </ul>
           </div>
         </div>
 
-        <div className="flex flex-col-reverse items-start justify-between gap-4 border-t border-white/10 py-6 text-sm text-white/45 sm:flex-row sm:items-center">
+        <div className="flex flex-col-reverse items-start justify-between gap-4 border-t border-white/10 py-6 text-sm text-white/75 sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} {site.name}. All rights reserved.</p>
           <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2">
             {legal.map((l) => (

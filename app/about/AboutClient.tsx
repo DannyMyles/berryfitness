@@ -83,7 +83,7 @@ export default function AboutClient() {
                 <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-fitness-primary/20 to-fitness-primary-dark/20 flex items-center justify-center`}>
                   <stat.icon size={28} className="text-fitness-primary" />
                 </div>
-                <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                <div className="text-3xl md:text-4xl font-bold text-fitness-primary mb-2">
                   {stat.parsed
                     ? `${stat.parsed.prefix}${Math.round(stat.parsed.n * progress)}${stat.parsed.suffix}`
                     : stat.value}

@@ -85,7 +85,7 @@ const Hero = () => {
                 {site.contactPhone && (
                   <a
                     href={telHref(site.contactPhone)}
-                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-white bg-fitness-dark hover:bg-fitness-primary transition-colors"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-fitness-primary-dark bg-fitness-primary/10 hover:bg-fitness-primary hover:text-white transition-colors"
                   >
                     <Phone size={18} /> Call {site.contactPhone}
                   </a>

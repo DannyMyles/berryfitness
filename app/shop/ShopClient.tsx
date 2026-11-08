@@ -130,7 +130,7 @@ export default function ShopClient() {
                   {shopHead.eyebrow}
                 </div>
                 <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.02] mb-3 md:mb-5">
-                  {shopHead.title}<br /><span className="text-fitness-primary">{shopHead.highlight}</span>
+                  {shopHead.title}<br /><span className="text-fitness-primary-light">{shopHead.highlight}</span>
                 </h1>
                 <p className="text-base md:text-lg text-white/70 max-w-lg leading-relaxed">
                   {shopHead.subtitle}
