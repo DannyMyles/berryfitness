@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { ArrowDown, ArrowUp, CheckCircle2, Mail, Plus, Send, Trash2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowDown, ArrowUp, CheckCircle2, ImageIcon, Mail, Plus, Send, Trash2, Upload } from 'lucide-react'
 import { AppSettings, SiteSettings, TitledText, adminKit } from './api'
 import { Button, Card, ErrorState, Field, ListInput, PageTitle, SkeletonRows, cx, inputClass, toast } from './ui'
 
@@ -203,8 +203,8 @@ export default function SettingsView({ showCorporate = false, pages = [] }: { sh
             <Field label="Second button link" hint="blank = WhatsApp">
               <input {...sub('hero', 'secondaryCtaUrl')} className={inputClass} />
             </Field>
-            <Field label="Hero image" hint="/image.jpg or https://…" className="sm:col-span-2">
-              <input {...sub('hero', 'imageUrl')} className={inputClass} />
+            <Field label="Hero image" hint="upload a photo or paste a link" className="sm:col-span-2">
+              <ImageInput value={s.hero?.imageUrl ?? ''} onChange={(v) => patch('hero', { ...s.hero, imageUrl: v })} />
             </Field>
             <Field label="Short selling points" className="sm:col-span-2">
               <ListInput value={s.hero?.perks ?? []} onChange={(v) => patch('hero', { ...s.hero, perks: v })} max={6} placeholder="e.g. Groups welcome" />
@@ -237,8 +237,8 @@ export default function SettingsView({ showCorporate = false, pages = [] }: { sh
                   </Field>
                 )}
                 {pg.image && (
-                  <Field label="Banner image" hint="/image.jpg or https://…">
-                    <input value={value.imageUrl ?? ''} onChange={(e) => setPage('imageUrl', e.target.value)} className={inputClass} />
+                  <Field label="Banner image" hint="upload a photo or paste a link">
+                    <ImageInput value={value.imageUrl ?? ''} onChange={(v) => setPage('imageUrl', v)} />
                   </Field>
                 )}
                 <Field label="Intro text" className="sm:col-span-2">
@@ -270,8 +270,8 @@ export default function SettingsView({ showCorporate = false, pages = [] }: { sh
             <Field label="Our story" hint="separate paragraphs with a blank line">
               <textarea rows={7} maxLength={6000} {...sub('about', 'story')} className={inputClass} />
             </Field>
-            <Field label="Banner image" hint="/image.jpg or https://…">
-              <input {...sub('about', 'imageUrl')} className={inputClass} />
+            <Field label="Banner image" hint="upload a photo or paste a link">
+              <ImageInput value={s.about?.imageUrl ?? ''} onChange={(v) => patch('about', { ...s.about, imageUrl: v })} />
             </Field>
           </Card>
           <TitledListEditor title="Values" items={s.values ?? []} onChange={(v) => patch('values', v)} max={9} />
@@ -287,8 +287,8 @@ export default function SettingsView({ showCorporate = false, pages = [] }: { sh
           <Field label="Introduction" className="sm:col-span-2">
             <textarea rows={3} maxLength={600} {...sub('corporate', 'subtitle')} className={inputClass} />
           </Field>
-          <Field label="Image" hint="/image.jpg or https://…">
-            <input {...sub('corporate', 'imageUrl')} className={inputClass} />
+          <Field label="Image" hint="upload a photo or paste a link">
+            <ImageInput value={s.corporate?.imageUrl ?? ''} onChange={(v) => patch('corporate', { ...s.corporate, imageUrl: v })} />
           </Field>
           <Field label="Always quote from this many people" hint="larger groups skip fixed prices">
             <input
@@ -482,8 +482,8 @@ function TeamEditor({ items, onChange }: { items: Member[]; onChange: (v: Member
               <Field label="Bio" className="sm:col-span-2">
                 <textarea rows={3} value={m.bio} onChange={(e) => ops.update(i, { bio: e.target.value })} maxLength={600} className={inputClass} />
               </Field>
-              <Field label="Photo" hint="/photo.jpg or https://…">
-                <input value={m.imageUrl ?? ''} onChange={(e) => ops.update(i, { imageUrl: e.target.value })} className={inputClass} />
+              <Field label="Photo" hint="upload a photo or paste a link">
+                <ImageInput value={m.imageUrl ?? ''} onChange={(v) => ops.update(i, { imageUrl: v })} />
               </Field>
               <Field label="Specialities">
                 <ListInput value={m.expertise ?? []} onChange={(v) => ops.update(i, { expertise: v })} max={8} placeholder="e.g. Yoga" />
@@ -493,5 +493,81 @@ function TeamEditor({ items, onChange }: { items: Member[]; onChange: (v: Member
         ))}
       </div>
     </Card>
+  )
+}
+
+// --- Image fields ---------------------------------------------------------------
+
+/** Uploads go through this site's admin route (about 4.5 MB request limit on Vercel), so big photos are shrunk first. */
+const MAX_UPLOAD_BYTES = 3.5 * 1024 * 1024
+const MAX_EDGE = 2400
+
+async function shrinkIfLarge(file: File): Promise<File> {
+  if (file.size <= MAX_UPLOAD_BYTES || file.type === 'image/gif') return file
+  const bitmap = await createImageBitmap(file)
+  const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height))
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.round(bitmap.width * scale)
+  canvas.height = Math.round(bitmap.height * scale)
+  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+  bitmap.close()
+  for (const quality of [0.85, 0.75, 0.6]) {
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality))
+    if (blob && blob.size <= MAX_UPLOAD_BYTES) return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' })
+  }
+  throw new Error('This photo is too large. Please choose one under 3.5 MB.')
+}
+
+/** A settings image: preview, a path/URL box, and an Upload button that fills the box. */
+function ImageInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const [broken, setBroken] = useState(false)
+
+  const upload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = e.target.files?.[0]
+    e.target.value = ''
+    if (!picked) return
+    if (!picked.type.startsWith('image/')) return toast('Please choose an image file (JPG, PNG, WebP or GIF).', 'error')
+    setUploading(true)
+    try {
+      const file = await shrinkIfLarge(picked)
+      const form = new FormData()
+      form.append('image', file)
+      const url = await adminKit.uploadSiteImage(form)
+      setBroken(false)
+      onChange(url)
+      toast('Photo uploaded. Click "Save settings" to put it on the website.')
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Upload failed. Please try again.', 'error')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+        {value && !broken ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={value} alt="" className="h-full w-full object-cover" onError={() => setBroken(true)} onLoad={() => setBroken(false)} />
+        ) : (
+          <ImageIcon className="h-5 w-5 text-gray-300" />
+        )}
+      </div>
+      <input
+        value={value}
+        onChange={(e) => {
+          setBroken(false)
+          onChange(e.target.value)
+        }}
+        placeholder="/image.jpg or https://…"
+        className={inputClass}
+      />
+      <Button type="button" variant="secondary" loading={uploading} onClick={() => fileRef.current?.click()} className="shrink-0">
+        {!uploading && <Upload className="h-4 w-4" />} {uploading ? 'Uploading…' : 'Upload'}
+      </Button>
+      <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={upload} />
+    </div>
   )
 }

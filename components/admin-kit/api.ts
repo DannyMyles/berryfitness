@@ -313,6 +313,8 @@ export const adminKit = {
   deleteGalleryImage: (id: string) => call<void>(`gallery/images/${id}`, { method: 'DELETE' }),
 
   settings: () => call<AppSettings>('app/admin'),
+  /** Uploads a photo for a settings image field and returns the URL to store in it. */
+  uploadSiteImage: (form: FormData) => call<{ url: string }>('app/images', { method: 'POST', body: form }).then((r) => r.url),
   saveSettings: (body: Partial<Omit<AppSettings, 'key' | 'emailConfigured' | 'settings'>> & { settings?: SiteSettings }) =>
     call<AppSettings & { message: string }>('app', json('PUT', body)),
   testEmail: (to: string) => call<EmailOutcome>('app/test-email', json('POST', { to })),
